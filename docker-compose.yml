@@ -13,8 +13,8 @@ services:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
       POSTGRES_DB: receipts_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
 
-volumes:
-  postgres_data:
+#volumes:
+#  postgres_data:

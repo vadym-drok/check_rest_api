@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
-from models import User, Receipt
+from app.models import User, Receipt
 from passlib.context import CryptContext
-from datetime import datetime
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()

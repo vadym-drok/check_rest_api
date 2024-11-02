@@ -1,10 +1,9 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
-from database import SessionLocal
+from app.database import SessionLocal
 import jwt
-from models import User
-from crud import get_user_by_username
+from app.crud import get_user_by_username
 from fastapi import HTTPException
 
 SECRET_KEY = "your_secret_key_here"
