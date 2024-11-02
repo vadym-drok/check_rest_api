@@ -27,7 +27,7 @@ def create_receipt(receipt: ReceiptCreate, db: Session = Depends(get_db), curren
 
 # Initialize database
 def init_db():
-    from database import engine, Base
+    from app.database import engine, Base
     Base.metadata.create_all(bind=engine)
 
 init_db()
