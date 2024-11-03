@@ -1,8 +1,8 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from app.dependencies import get_db, get_current_user
 from app.models import User
-from app.schemas import UserCreate, ReceiptCreate, ReceiptResponse
+from app.schemas import UserCreate, UserResponse, ReceiptCreate, ReceiptResponse
 from app.crud import get_user_by_username, create_user, create_receipt_record
 
 
@@ -10,13 +10,18 @@ app = FastAPI(docs_url='/')
 
 
 # User registration endpoint
-@app.post("/register")
+@app.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = get_user_by_username(db, user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
     new_user = create_user(db, user)
-    return {"msg": "User registered successfully"}
+    return new_user
+
+
+# @app.post('/login', response_model=Token)
+# def login():
+#     pass
 
 
 # Create receipt endpoint

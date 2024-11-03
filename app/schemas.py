@@ -4,8 +4,18 @@ from datetime import datetime
 
 
 class UserCreate(BaseModel):
+    first_name: str
+    last_name: str
     username: str
     password: str
+
+
+class UserResponse(BaseModel):
+    username: str
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
 class ReceiptCreate(BaseModel):
