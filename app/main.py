@@ -6,7 +6,7 @@ from app.schemas import UserCreate, ReceiptCreate, ReceiptResponse
 from app.crud import get_user_by_username, create_user, create_receipt_record
 
 
-app = FastAPI()
+app = FastAPI(docs_url='/')
 
 
 # User registration endpoint
