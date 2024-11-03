@@ -11,7 +11,10 @@ passlib==1.7.4
 psycopg2-binary==2.9.9
 pyasn1==0.6.1
 pydantic==2.9.2
+pydantic-settings==2.3.4
 pydantic_core==2.23.4
+pydantic[email]
+PyJWT==2.9.0
 python-jose==3.3.0
 rsa==4.9
 six==1.16.0
@@ -20,4 +23,3 @@ SQLAlchemy==2.0.36
 starlette==0.41.2
 typing_extensions==4.12.2
 uvicorn==0.32.0
-pyjwt
