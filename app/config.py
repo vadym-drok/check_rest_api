@@ -9,11 +9,11 @@ class Settings(BaseSettings):
     db_host: str
     db_port: int
     db_driver: str
+    pgadmin_email: EmailStr
+    pgadmin_password: str
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
-    pgadmin_email: EmailStr
-    pgadmin_password: str
 
     class Config:
         env_file = '.env'

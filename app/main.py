@@ -1,10 +1,9 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from app.dependencies import get_db, get_current_user
-from app.models import User
-from app.schemas import UserCreate, UserResponse, ReceiptCreate, ReceiptResponse
-from app.crud import get_user_by_username, create_user, create_receipt_record
-
+from app.dependencies import get_db
+from app.schemas import UserCreate, UserResponse, UserLogin, Token
+from app.crud import get_user_by_username, create_user, create_access_token
+from app.utils import verify_password
 
 app = FastAPI(docs_url='/')
 
@@ -19,26 +18,25 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 # # User login endpoint
-# @app.post('/login', response_model=Token)
-# def login(login_data: LoginRequest, db: Session = Depends(get_db)):
-#     user = get_user_by_username(db, login_data.username)
-#     if not user or not verify_password(login_data.password, user.hashed_password):
-#         raise HTTPException(status_code=401, detail="Invalid username or password")
-#     # Generate JWT token
-#     token_data = {
-#         "sub": user.username,
-#         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token valid for 1 hour
-#     }
-#     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-#     return {"access_token": token, "token_type": "bearer"}
+@app.post('/login', response_model=Token)
+def login(login_data: UserLogin, db: Session = Depends(get_db)):
+    user = get_user_by_username(db, login_data.username)
+    if not user or not verify_password(login_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    # Generate JWT token
+    token_data = {
+        "username": user.username,
+    }
+    token = create_access_token(token_data)
+    return {"access_token": token, "token_type": "bearer"}
 
 
 
 # Create receipt endpoint
-@app.post("/receipts", response_model=ReceiptResponse)
-def create_receipt(receipt: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    new_receipt = create_receipt_record(db, current_user, receipt)
-    return new_receipt
+# @app.post("/receipts", response_model=ReceiptResponse)
+# def create_receipt(receipt: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+#     new_receipt = create_receipt_record(db, current_user, receipt)
+#     return new_receipt
 
 
 # Initialize database
