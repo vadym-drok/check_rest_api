@@ -3,16 +3,19 @@ from typing import List
 from datetime import datetime
 
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     first_name: str
     last_name: str
     username: str
+
+
+class UserCreate(UserBase):
     password: str
 
 
-class UserResponse(BaseModel):
+class UserResponse(UserBase):
     username: str
-    id: int
+    created_at: datetime
 
     class Config:
         orm_mode = True

@@ -11,8 +11,8 @@ def get_user_by_username(db: Session, username: str):
 
 
 def create_user(db: Session, user_data):
-    hashed_password = pwd_context.hash(user_data.password)
-    new_user = User(username=user_data.username, hashed_password=hashed_password)
+    user_data.password = hash(user_data.password)
+    new_user = User(**user_data.dict())
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
