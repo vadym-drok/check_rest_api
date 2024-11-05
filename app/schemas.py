@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import BaseModel
 from typing import List, Union
 from datetime import datetime
@@ -30,11 +32,20 @@ class Token(BaseModel):
     token_type: str
 
 
-# class ReceiptCreate(BaseModel):
-#     products: List[dict]
-#     payment: dict
-#
-#
+class TokenData(BaseModel):
+    username: Union[str, None] = None
+
+
+class Payment(BaseModel):
+    payment_type: str
+    total: Decimal
+
+
+class ReceiptCreate(BaseModel):
+    products: List[dict]
+    payment: Payment
+
+
 # class ReceiptResponse(BaseModel):
 #     id: int
 #     products: List[dict]

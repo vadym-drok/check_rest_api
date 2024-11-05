@@ -17,10 +17,15 @@ class User(Base):
     receipts = relationship("Receipt", back_populates="owner")
 
 
-class Receipt(Base):  # TODO
+class Receipt(Base):
     __tablename__ = 'receipts'
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    total = Column(Float)
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="receipts")
+
+
+class PaymentType():
+    __tablename__ = 'payment_types'
+    code = Column(String, primary_key=True, index=True)
+    name = Column(String)
