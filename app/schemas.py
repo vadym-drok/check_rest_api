@@ -17,7 +17,7 @@ class UserResponse(UserBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserLogin(BaseModel):
@@ -30,19 +30,15 @@ class Token(BaseModel):
     token_type: str
 
 
-class TokenData(BaseModel):
-    username: Union[str, None] = None
-
-
-class ReceiptCreate(BaseModel):
-    products: List[dict]
-    payment: dict
-
-
-class ReceiptResponse(BaseModel):
-    id: int
-    products: List[dict]
-    payment: dict
-    total: float
-    rest: float
-    created_at: datetime
+# class ReceiptCreate(BaseModel):
+#     products: List[dict]
+#     payment: dict
+#
+#
+# class ReceiptResponse(BaseModel):
+#     id: int
+#     products: List[dict]
+#     payment: dict
+#     total: float
+#     rest: float
+#     created_at: datetime

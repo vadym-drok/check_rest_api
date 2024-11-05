@@ -17,7 +17,7 @@ class User(Base):
     receipts = relationship("Receipt", back_populates="owner")
 
 
-class Receipt(Base):
+class Receipt(Base):  # TODO
     __tablename__ = 'receipts'
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)

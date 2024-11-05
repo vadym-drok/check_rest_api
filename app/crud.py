@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.models import User
 from passlib.context import CryptContext
 
+from app.schemas import Token
 from app.utils import get_password_hash, verify_password
 import jwt
 from app.config import settings
@@ -21,7 +22,7 @@ def authenticate_user(db, username: str, password: str):
     user = get_user_by_username(db, username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -34,7 +35,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
         expire = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
-    return encoded_jwt
+    return Token(access_token=encoded_jwt, token_type="bearer")
 
 
 def create_user(db: Session, user_data):

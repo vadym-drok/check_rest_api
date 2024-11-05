@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from app.dependencies import get_db
-from app.schemas import UserCreate, UserResponse, UserLogin, Token
-from app.crud import get_user_by_username, create_user, create_access_token
+from fastapi.security import OAuth2PasswordRequestForm
+from app.database import get_db
+from app.schemas import UserCreate, UserResponse, Token
+from app.crud import get_user_by_username, create_user, create_access_token, authenticate_user
 from app.utils import verify_password
 
 app = FastAPI(docs_url='/')
@@ -19,17 +20,16 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 # # User login endpoint
 @app.post('/login', response_model=Token)
-def login(login_data: UserLogin, db: Session = Depends(get_db)):
-    user = get_user_by_username(db, login_data.username)
-    if not user or not verify_password(login_data.password, user.password):
+def login(login_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = authenticate_user(db, login_data.username, login_data.password)
+    if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    # Generate JWT token
+
     token_data = {
         "username": user.username,
     }
-    token = create_access_token(token_data)
-    return {"access_token": token, "token_type": "bearer"}
-
+    access_token = create_access_token(token_data)
+    return access_token
 
 
 # Create receipt endpoint
