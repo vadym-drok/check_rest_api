@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime, timezone
 from typing import Union
 from sqlalchemy.orm import Session
-from app.models import User
+from app.models import User, Receipt
 from app.schemas import Token, ReceiptCreate
 from app.utils import get_password_hash
 import jwt
@@ -28,13 +28,15 @@ def create_user(db: Session, user_data: dict):
     return new_user
 
 
-# def create_receipt_record(db: Session, current_user: User, receipt_data: ReceiptCreate):
+def create_receipt_record(db: Session, current_user: User, receipt_data: ReceiptCreate):
 #     total = sum(item["price"] * item["quantity"] for item in receipt_data.products)
 #     rest = receipt_data.payment["amount"] - total
-#     new_receipt = Receipt(owner_id=current_user.id, total=total)
-#     db.add(new_receipt)
-#     db.commit()
-#     db.refresh(new_receipt)
+    new_receipt = Receipt(owner_id=current_user.id, total=100)
+    db.add(new_receipt)
+    db.commit()
+    db.refresh(new_receipt)
+
+    return new_receipt
 #     return {
 #         "id": new_receipt.id,
 #         "products": receipt_data.products,
@@ -43,4 +45,3 @@ def create_user(db: Session, user_data: dict):
 #         "rest": rest,
 #         "created_at": new_receipt.created_at
 #     }
-#     pass

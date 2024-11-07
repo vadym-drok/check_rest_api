@@ -55,8 +55,11 @@ class ReceiptCreate(BaseModel):
 
 class ReceiptResponse(BaseModel):  # TODO
     id: int
-    goods: List[dict]
-    payment: dict
-    total: float
-    rest: float
+    # goods: List[dict]
+    # payment: dict
+    # total: float
+    # rest: float
     created_at: datetime
+
+    class Config:
+        from_attributes = True

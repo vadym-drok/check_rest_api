@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from app.database import get_db
-from app.models import User
+from app.models import User, Receipt
 from app.schemas import UserCreate, UserResponse, Token, ReceiptCreate, ReceiptResponse
-from app.crud import create_user, create_access_token #, create_receipt_record
+from app.crud import create_user, create_access_token, create_receipt_record
 from app.utils import get_user_by_username, authenticate_user, verify_access_token
 
 router = APIRouter()
@@ -32,9 +32,15 @@ def login(login_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     return access_token
 
 
-# @router.post("/receipts", response_model=ReceiptResponse)
-# def create_receipt(
-#         receipt: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)
-# ):
-    # new_receipt = create_receipt_record(db, current_user, receipt)
-    # return None#new_receipt
+@router.post("/receipts", status_code=status.HTTP_201_CREATED, response_model=ReceiptResponse)
+def create_receipt(
+        receipt: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)
+):
+    new_receipt = create_receipt_record(db, current_user, receipt)
+    # new_receipt = Receipt(owner_id=current_user.id, total=100)
+    # db.add(new_receipt)
+    # db.commit()
+    # db.refresh(new_receipt)
+    # print(ReceiptResponse.from_orm(new_receipt))
+    # response = ReceiptResponse.from_orm(new_receipt)
+    return new_receipt
