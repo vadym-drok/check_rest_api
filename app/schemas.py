@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from pydantic import BaseModel
-from typing import List, Union
+from typing import List, Union, Dict
 from datetime import datetime
 
 
@@ -41,15 +41,22 @@ class Payment(BaseModel):
     total: Decimal
 
 
+class Goods(BaseModel):
+    name: str
+    price: Decimal
+    quantity: int
+
+
 class ReceiptCreate(BaseModel):
-    products: List[dict]
+    goods: List[Goods]
     payment: Payment
+    add_info: Union[Dict, None] = None
 
 
-# class ReceiptResponse(BaseModel):
-#     id: int
-#     products: List[dict]
-#     payment: dict
-#     total: float
-#     rest: float
-#     created_at: datetime
+class ReceiptResponse(BaseModel):  # TODO
+    id: int
+    goods: List[dict]
+    payment: dict
+    total: float
+    rest: float
+    created_at: datetime

@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, timezone
 from typing import Union
 from sqlalchemy.orm import Session
 from app.models import User
-from app.schemas import Token
+from app.schemas import Token, ReceiptCreate
 from app.utils import get_password_hash
 import jwt
 from app.config import settings
@@ -19,7 +19,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return Token(access_token=encoded_jwt, token_type="bearer")
 
 
-def create_user(db: Session, user_data):
+def create_user(db: Session, user_data: dict):
     user_data.password = get_password_hash(user_data.password)
     new_user = User(**user_data.dict())
     db.add(new_user)
@@ -28,7 +28,7 @@ def create_user(db: Session, user_data):
     return new_user
 
 
-# def create_receipt_record(db: Session, current_user: User, receipt_data):
+# def create_receipt_record(db: Session, current_user: User, receipt_data: ReceiptCreate):
 #     total = sum(item["price"] * item["quantity"] for item in receipt_data.products)
 #     rest = receipt_data.payment["amount"] - total
 #     new_receipt = Receipt(owner_id=current_user.id, total=total)
@@ -43,3 +43,4 @@ def create_user(db: Session, user_data):
 #         "rest": rest,
 #         "created_at": new_receipt.created_at
 #     }
+#     pass
