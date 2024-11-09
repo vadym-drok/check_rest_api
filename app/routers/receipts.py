@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -28,3 +30,23 @@ def create_receipt(
     )
 
     return response
+
+
+@router.get('/{id}', response_model=ReceiptResponse)
+def get_receipt(id: int, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)):
+    pass
+
+
+@router.get('/', response_model=List[ReceiptResponse])
+def get_receipts(
+        db: Session = Depends(get_db),
+        current_user: User = Depends(verify_access_token),
+        skip: int = 0, search: Optional[str] = ''
+):
+    pass
+
+
+@router.get('/{id}')
+def get_receipt_by_link(id: int, row_length: int = 20, db: Session = Depends(get_db)):
+    # 19 < row_length < 120
+    return  # str
