@@ -5,8 +5,8 @@ from app.config import settings
 
 
 SQLALCHEMY_DATABASE_URL = f'postgresql{settings.add_db_driver()}://' \
-                          f'{settings.db_user_name}:{settings.db_user_password}' \
-                          f'@{settings.db_host}:{settings.db_port}/{settings.db_name}'
+                          f'{settings.DB_USER_NAME}:{settings.DB_USER_PASSWORD}' \
+                          f'@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
