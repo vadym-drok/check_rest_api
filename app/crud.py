@@ -32,7 +32,16 @@ def create_user(db: Session, user_data: dict):
 
 def create_receipt_record(db: Session, current_user: User, receipt_data: ReceiptCreate):
     raw_data = json.dumps(receipt_data.dict(), cls=DecimalEncoder)
-    receipt = Receipt(owner_id=current_user.id, raw_data=raw_data, id=generate_random_id())
+    total = sum(item.price * item.quantity for item in receipt_data.products)
+
+    receipt = Receipt(
+        owner_id=current_user.id,
+        raw_data=raw_data,
+        id=generate_random_id(),
+        total=total,
+        amount=receipt_data.payment.amount,
+        rest=receipt_data.payment.amount - total,
+    )
     db.add(receipt)
     db.commit()
     db.refresh(receipt)

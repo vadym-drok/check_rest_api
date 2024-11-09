@@ -52,7 +52,7 @@ def verify_access_token(token: Annotated[str, Depends(oauth2_scheme)], db: Sessi
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, ALGORITHMs=[settings.ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("username")
         if username is None:
             raise credentials_exception
