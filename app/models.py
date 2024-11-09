@@ -22,7 +22,7 @@ class Receipt(Base):
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"))
-    # raw_data = Column(JSON)
+    raw_data = Column(JSON)
     owner = relationship("User", back_populates="receipts")
 
 

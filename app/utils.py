@@ -1,3 +1,6 @@
+import json
+from decimal import Decimal
+
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -47,7 +50,7 @@ def verify_access_token(token: Annotated[str, Depends(oauth2_scheme)], db: Sessi
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         username: str = payload.get("username")
         if username is None:
             raise credentials_exception
@@ -58,3 +61,10 @@ def verify_access_token(token: Annotated[str, Depends(oauth2_scheme)], db: Sessi
     if user is None:
         raise credentials_exception
     return user
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)

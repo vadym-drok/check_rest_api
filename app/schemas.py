@@ -37,28 +37,27 @@ class TokenData(BaseModel):
 
 
 class Payment(BaseModel):
-    payment_type: str
-    total: Decimal
+    type: str
+    amount: Decimal
 
 
-class Goods(BaseModel):
+class Product(BaseModel):
     name: str
     price: Decimal
     quantity: int
 
 
 class ReceiptCreate(BaseModel):
-    goods: List[Goods]
+    products: List[Product]
     payment: Payment
     add_info: Union[Dict, None] = None
 
 
-class ReceiptResponse(BaseModel):  # TODO
-    id: int
-    # goods: List[dict]
-    # payment: dict
-    # total: float
-    # rest: float
+class ReceiptResponse(BaseModel):
+    products: List[Product]  # TODO + total
+    payment: Payment
+    total: Decimal
+    rest: Decimal
     created_at: datetime
 
     class Config:

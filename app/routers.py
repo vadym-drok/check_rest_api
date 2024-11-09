@@ -34,13 +34,16 @@ def login(login_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
 
 @router.post("/receipts", status_code=status.HTTP_201_CREATED, response_model=ReceiptResponse)
 def create_receipt(
-        receipt: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)
+        receipt_data: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)
 ):
-    new_receipt = create_receipt_record(db, current_user, receipt)
-    # new_receipt = Receipt(owner_id=current_user.id, total=100)
-    # db.add(new_receipt)
-    # db.commit()
-    # db.refresh(new_receipt)
-    # print(ReceiptResponse.from_orm(new_receipt))
-    # response = ReceiptResponse.from_orm(new_receipt)
-    return new_receipt
+    receipt = create_receipt_record(db, current_user, receipt_data)
+    total = sum(item.price * item.quantity for item in receipt_data.products)
+    response = ReceiptResponse(
+        products=receipt_data.products,
+        payment=receipt_data.payment,
+        total=total,
+        rest=receipt_data.payment.amount - total,
+        created_at=receipt.created_at
+    )
+
+    return response
