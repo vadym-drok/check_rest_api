@@ -39,6 +39,7 @@ def create_receipt(
     receipt = create_receipt_record(db, current_user, receipt_data)
     total = sum(item.price * item.quantity for item in receipt_data.products)
     response = ReceiptResponse(
+        id=receipt.id,
         products=receipt_data.products,
         payment=receipt_data.payment,
         total=total,

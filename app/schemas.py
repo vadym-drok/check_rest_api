@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import List, Union, Dict
 from datetime import datetime
 
@@ -45,6 +45,13 @@ class Product(BaseModel):
     name: str
     price: Decimal
     quantity: int
+    total: Decimal = None
+
+    @validator('total', pre=True, always=True)
+    def calculate_total(cls, value, values):
+        if 'price' in values and 'quantity' in values:
+            return values['price'] * values['quantity']
+        return value
 
 
 class ReceiptCreate(BaseModel):
@@ -54,7 +61,8 @@ class ReceiptCreate(BaseModel):
 
 
 class ReceiptResponse(BaseModel):
-    products: List[Product]  # TODO + total
+    id: int
+    products: List[Product]
     payment: Payment
     total: Decimal
     rest: Decimal
