@@ -1,6 +1,3 @@
-import json
-from decimal import Decimal
-
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -10,9 +7,9 @@ from starlette import status
 from typing_extensions import Annotated
 
 from app.database import get_db
-from app.models import User
 from sqlalchemy.orm import Session
 from app.config import settings
+from app.models import User
 from app.schemas import TokenData
 import random
 import string
@@ -27,10 +24,6 @@ def get_password_hash(password):
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_user_by_username(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
 
 
 def authenticate_user(db: Session, username: str, password: str):
@@ -69,8 +62,5 @@ def generate_random_id(length=12):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Decimal):
-            return float(obj)
-        return super().default(obj)
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()

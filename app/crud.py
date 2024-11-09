@@ -1,11 +1,9 @@
-import json
-
 from datetime import timedelta, datetime, timezone
 from typing import Union
 from sqlalchemy.orm import Session
 from app.models import User, Receipt
 from app.schemas import Token, ReceiptCreate
-from app.utils import get_password_hash, DecimalEncoder, generate_random_id
+from app.utils import get_password_hash, generate_random_id
 import jwt
 from app.config import settings
 
@@ -31,12 +29,11 @@ def create_user(db: Session, user_data: dict):
 
 
 def create_receipt_record(db: Session, current_user: User, receipt_data: ReceiptCreate):
-    raw_data = json.dumps(receipt_data.dict(), cls=DecimalEncoder)
     total = sum(item.price * item.quantity for item in receipt_data.products)
 
     receipt = Receipt(
         owner_id=current_user.id,
-        raw_data=raw_data,
+        raw_data=receipt_data.dict(),
         id=generate_random_id(),
         total=total,
         amount=receipt_data.payment.amount,

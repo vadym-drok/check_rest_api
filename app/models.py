@@ -1,9 +1,12 @@
+import json
+
 from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 from datetime import datetime
 from app.database import Base
+from app.services import DecimalEncoder
 
 
 class User(Base):
@@ -22,11 +25,19 @@ class Receipt(Base):
     id = Column(String(12), primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"))
-    raw_data = Column(JSON)
+    _raw_data = Column(JSON)
     total = Column(DECIMAL(18, 6), nullable=False)
     amount = Column(DECIMAL(18, 6), nullable=False)
     rest = Column(DECIMAL(18, 6), nullable=False)
     owner = relationship("User", back_populates="receipts")
+
+    @property
+    def raw_data(self):
+        return json.loads(self._raw_data)
+
+    @raw_data.setter
+    def raw_data(self, value):
+        self._raw_data = json.dumps(value, cls=DecimalEncoder)
 
 
 class PaymentType():
