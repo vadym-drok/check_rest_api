@@ -5,7 +5,7 @@ from typing import Union
 from sqlalchemy.orm import Session
 from app.models import User, Receipt
 from app.schemas import Token, ReceiptCreate
-from app.utils import get_password_hash, DecimalEncoder
+from app.utils import get_password_hash, DecimalEncoder, generate_random_id
 import jwt
 from app.config import settings
 
@@ -32,7 +32,7 @@ def create_user(db: Session, user_data: dict):
 
 def create_receipt_record(db: Session, current_user: User, receipt_data: ReceiptCreate):
     raw_data = json.dumps(receipt_data.dict(), cls=DecimalEncoder)
-    receipt = Receipt(owner_id=current_user.id, raw_data=raw_data)
+    receipt = Receipt(owner_id=current_user.id, raw_data=raw_data, id=generate_random_id())
     db.add(receipt)
     db.commit()
     db.refresh(receipt)

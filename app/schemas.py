@@ -59,7 +59,7 @@ class ReceiptCreate(BaseModel):
 
 
 class ReceiptResponse(BaseModel):
-    id: int
+    id: str
     products: List[Product]
     payment: Payment
     total: Decimal

@@ -22,7 +22,7 @@ class User(Base):
 
 class Receipt(Base):
     __tablename__ = 'receipts'
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(12), primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"))
     raw_data = Column(JSON)

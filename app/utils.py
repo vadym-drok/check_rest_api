@@ -14,6 +14,8 @@ from app.models import User
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.schemas import TokenData
+import random
+import string
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -61,6 +63,10 @@ def verify_access_token(token: Annotated[str, Depends(oauth2_scheme)], db: Sessi
     if user is None:
         raise credentials_exception
     return user
+
+
+def generate_random_id(length=12):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
 class DecimalEncoder(json.JSONEncoder):
