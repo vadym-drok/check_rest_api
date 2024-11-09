@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from app.database import get_db
-from app.models import User, Receipt
+from app.models import User
 from app.schemas import UserCreate, UserResponse, Token, ReceiptCreate, ReceiptResponse
 from app.crud import create_user, create_access_token, create_receipt_record
 from app.utils import get_user_by_username, authenticate_user, verify_access_token
@@ -37,13 +37,12 @@ def create_receipt(
         receipt_data: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)
 ):
     receipt = create_receipt_record(db, current_user, receipt_data)
-    total = sum(item.price * item.quantity for item in receipt_data.products)
     response = ReceiptResponse(
         id=receipt.id,
         products=receipt_data.products,
         payment=receipt_data.payment,
-        total=total,
-        rest=receipt_data.payment.amount - total,
+        total=receipt.total,
+        rest=receipt.rest,
         created_at=receipt.created_at
     )
 

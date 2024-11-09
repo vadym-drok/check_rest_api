@@ -1,3 +1,6 @@
+import json
+from decimal import Decimal
+
 from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -24,6 +27,17 @@ class Receipt(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
     raw_data = Column(JSON)
     owner = relationship("User", back_populates="receipts")
+
+    @property
+    def total(self):
+        raw_data = json.loads(self.raw_data)
+        total = Decimal(sum(item['price'] * item['quantity'] for item in raw_data['products']))
+        return round(total, 6)
+
+    @property
+    def rest(self):
+        raw_data = json.loads(self.raw_data)
+        return round(Decimal(raw_data['payment']['amount']) - self.total, 6)
 
 
 class PaymentType():

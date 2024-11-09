@@ -49,9 +49,7 @@ class Product(BaseModel):
 
     @validator('total', pre=True, always=True)
     def calculate_total(cls, value, values):
-        if 'price' in values and 'quantity' in values:
-            return values['price'] * values['quantity']
-        return value
+        return round(values['price'] * values['quantity'], 6)
 
 
 class ReceiptCreate(BaseModel):
@@ -67,6 +65,3 @@ class ReceiptResponse(BaseModel):
     total: Decimal
     rest: Decimal
     created_at: datetime
-
-    class Config:
-        from_attributes = True

@@ -1,7 +1,6 @@
 import json
 
 from datetime import timedelta, datetime, timezone
-from decimal import Decimal
 from typing import Union
 from sqlalchemy.orm import Session
 from app.models import User, Receipt
