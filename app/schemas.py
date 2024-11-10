@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from pydantic import BaseModel, validator
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Literal
 from datetime import datetime
 
 
@@ -37,7 +37,7 @@ class TokenData(BaseModel):
 
 
 class Payment(BaseModel):
-    type: str
+    type: Literal['cash', 'cashless']
     amount: Decimal
 
 

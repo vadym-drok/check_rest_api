@@ -38,9 +38,3 @@ class Receipt(Base):
     @raw_data.setter
     def raw_data(self, value):
         self._raw_data = json.dumps(value, cls=DecimalEncoder)
-
-
-class PaymentType():
-    __tablename__ = 'payment_types'
-    code = Column(String, primary_key=True, index=True)
-    name = Column(String)
