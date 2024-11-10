@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 from app.database import get_db
 from sqlalchemy.orm import Session
 from app.config import settings
-from app.models import User
+from app.models import User, Receipt
 from app.schemas import TokenData
 import random
 import string
@@ -64,3 +64,26 @@ def generate_random_id(length=12):
 
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
+
+
+def create_receipt_preview(receipt: Receipt, line_length: int) -> str:
+    header = "ФОП Джонсонюк Борис".center(line_length)  # TODO -> move to User LegalEntity
+    separator = "=" * line_length
+    product_lines = []
+    for product in receipt.raw_data['products']:
+        quantity_price = f"{product['quantity']} x {product['price']:.2f}".ljust(line_length // 2)
+        total_price = f"{product['quantity'] * product['price']:.2f}".rjust(line_length // 2)
+        product_name = product['name'][:line_length].ljust(line_length)
+        product_lines.append(f"{quantity_price}{total_price}\n{product_name}")
+
+    total_line = f"СУМА{str(receipt.total):>{line_length - len('СУМА')}}"
+    payment_line = f"Картка{str(receipt.amount):>{line_length - len('Картка')}}"
+    rest_line = f"Решта{str(receipt.rest):>{line_length - len('Решта')}}"
+    footer = "Дякуємо за покупку!".center(line_length)
+    date_time = receipt.created_at.strftime("%d.%m.%Y %H:%M").center(line_length)
+
+    receipt_str = f"{header}\n{separator}\n"
+    receipt_str += "\n".join(product_lines) + "\n"
+    receipt_str += f"{separator}\n{total_line}\n{payment_line}\n{rest_line}\n{separator}\n{date_time}\n{footer}"
+
+    return receipt_str

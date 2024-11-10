@@ -21,6 +21,11 @@ class User(Base):
 
 
 class Receipt(Base):
+    """
+    TODO:
+    Analyze the actual usage of the table – it might be worthwhile to reassess which data should be stored in fields and
+    which should be calculated dynamically.
+    """
     __tablename__ = 'receipts'
     id = Column(String(12), primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
