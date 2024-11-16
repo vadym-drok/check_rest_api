@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Query, HTTPException, Depends, status
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -53,25 +54,26 @@ def get_receipt_preview(id: str, line_length: int = 20, db: Session = Depends(ge
 def get_receipts(
         db: Session = Depends(get_db),
         current_user: User = Depends(verify_access_token),
-        skip: int = 0,
-        limit: int = 10,
-
-        # date_from: Optional[datetime] = Query(None, description="Filter receipts created after this date"),
-        # date_to: Optional[datetime] = Query(None, description="Filter receipts created before this date"),
-        # min_total: Optional[float] = Query(None, description="Filter receipts with total greater than this amount"),
-        # max_total: Optional[float] = Query(None, description="Filter receipts with total less than this amount"),
-        # payment_type: Optional[str] = Query(None, description="Filter receipts by payment type"),
+        skip: int = Query(0, description="Number of records to skip for pagination"),
+        limit: int = Query(10, description="Number of receipts per page"),
+        date_from: Optional[datetime] = Query(None, description="Filter receipts created after this date"),
+        date_to: Optional[datetime] = Query(None, description="Filter receipts created before this date"),
+        min_total: Optional[float] = Query(None, description="Filter receipts with total greater than this amount"),
+        max_total: Optional[float] = Query(None, description="Filter receipts with total less than this amount"),
+        # payment_type: Optional[str] = Query(None, description="Filter receipts by payment type", regex="^(cash|cashless)$"),
 ):
-    receipts = db.query(Receipt).filter(Receipt.owner_id == current_user.id)\
-        .limit(limit)\
-        .offset(skip)
+    query = db.query(Receipt).filter(Receipt.owner_id == current_user.id)
 
-    # results = db.query(Post, func.count(Vote.post_id).label('votes'))\
-    #     .join(Vote, Vote.post_id == Post.id, isouter=True)\
-    #     .group_by(Post.id)\
-    #     .filter(Post.title.contains(search))\
-    #     .limit(limit)\
-    #     .offset(skip)
+    if date_from:
+        query = query.filter(Receipt.created_at >= date_from)
+    if date_to:
+        query = query.filter(Receipt.created_at <= date_to)
+    if min_total is not None:
+        query = query.filter(Receipt.total >= min_total)
+    if max_total is not None:
+        query = query.filter(Receipt.total <= max_total)
+
+    receipts = query.limit(limit).offset(skip)
 
     if receipts is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No receipts were found for this user")
