@@ -65,3 +65,14 @@ class ReceiptResponse(BaseModel):
     total: Decimal
     rest: Decimal
     created_at: datetime
+
+    @classmethod
+    def from_orm_with_nested(cls, receipt):
+        return cls(
+            id=receipt.id,
+            products=receipt.raw_data['products'],
+            payment=receipt.raw_data['payment'],
+            total=receipt.total,
+            rest=receipt.rest,
+            created_at=receipt.created_at
+        )

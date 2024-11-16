@@ -20,16 +20,8 @@ def create_receipt(
         receipt_data: ReceiptCreate, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)
 ):
     receipt = create_receipt_record(db, current_user, receipt_data)
-    response = ReceiptResponse(
-        id=receipt.id,
-        products=receipt_data.products,
-        payment=receipt_data.payment,
-        total=receipt.total,
-        rest=receipt.rest,
-        created_at=receipt.created_at
-    )
 
-    return response
+    return ReceiptResponse.from_orm_with_nested(receipt)
 
 
 @router.get('/{id}', response_model=ReceiptResponse)
@@ -39,16 +31,7 @@ def get_receipt(id: str, db: Session = Depends(get_db), current_user: User = Dep
     if receipt is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Receipt not found")
 
-    response = ReceiptResponse(
-        id=receipt.id,
-        products=receipt.raw_data['products'],
-        payment=receipt.raw_data['payment'],
-        total=receipt.total,
-        rest=receipt.rest,
-        created_at=receipt.created_at
-    )
-
-    return response
+    return ReceiptResponse.from_orm_with_nested(receipt)
 
 
 @router.get('/{id}/preview/', response_class=PlainTextResponse)
@@ -72,4 +55,11 @@ def get_receipts(
         current_user: User = Depends(verify_access_token),
         skip: int = 0, search: Optional[str] = ''
 ):
-    pass
+    receipts = db.query(Receipt).filter(Receipt.owner_id == current_user.id)
+
+    if receipts is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No receipts were found for this user")
+
+    response = [ReceiptResponse.from_orm_with_nested(receipt) for receipt in receipts]
+
+    return response
