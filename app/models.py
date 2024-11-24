@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
@@ -35,11 +36,11 @@ class Receipt(Base):
     __tablename__ = 'receipts'
     id = Column(String(12), primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    owner_id = Column(Integer, ForeignKey("users.id"))
     _raw_data = Column(JSON)
     total = Column(DECIMAL(18, 6), nullable=False)
     amount = Column(DECIMAL(18, 6), nullable=False)
     rest = Column(DECIMAL(18, 6), nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="receipts")
     payment_type = Column(String(12), nullable=False)
 

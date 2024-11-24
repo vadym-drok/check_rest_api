@@ -70,11 +70,17 @@ def create_receipt_preview(receipt: Receipt, line_length: int) -> str:
     header = "ФОП Джонсонюк Борис".center(line_length)  # TODO -> move to User LegalEntity
     separator = "=" * line_length
     product_lines = []
-    for product in receipt.raw_data['products']:
+    products = receipt.raw_data['products']
+
+    last_product = products[-1]
+    for product in products:
         quantity_price = f"{product['quantity']} x {product['price']:.2f}".ljust(line_length // 2)
         total_price = f"{product['quantity'] * product['price']:.2f}".rjust(line_length // 2)
         product_name = product['name'][:line_length].ljust(line_length)
         product_lines.append(f"{quantity_price}{total_price}\n{product_name}")
+
+        if product != last_product:
+            product_lines.append("-" * line_length)
 
     total_line = f"СУМА{str(receipt.total):>{line_length - len('СУМА')}}"
     payment_line = f"Картка{str(receipt.amount):>{line_length - len('Картка')}}"

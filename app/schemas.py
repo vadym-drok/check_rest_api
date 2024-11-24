@@ -52,6 +52,9 @@ class Product(BaseModel):
     quantity: int
     total: Decimal = None
 
+    class Config:
+        extra = "allow"
+
     @validator('total', pre=True, always=True)
     def calculate_total(cls, value, values):
         return round(values['price'] * values['quantity'], 6)
@@ -60,7 +63,6 @@ class Product(BaseModel):
 class ReceiptCreate(BaseModel):
     products: List[Product]
     payment: Payment
-    add_info: Union[Dict, None] = None
 
 
 class ReceiptResponse(BaseModel):
@@ -79,5 +81,5 @@ class ReceiptResponse(BaseModel):
             payment=receipt.raw_data['payment'],
             total=receipt.total,
             rest=receipt.rest,
-            created_at=receipt.created_at
+            created_at=receipt.created_at,
         )
