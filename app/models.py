@@ -1,5 +1,4 @@
 import json
-from typing import Dict
 
 from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
