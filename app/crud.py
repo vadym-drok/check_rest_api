@@ -30,14 +30,15 @@ def create_user(db: Session, user_data: dict):
 
 def create_receipt_record(db: Session, current_user: User, receipt_data: ReceiptCreate):
     total = sum(item.price * item.quantity for item in receipt_data.products)
-
+    payment = receipt_data.payment
     receipt = Receipt(
         owner_id=current_user.id,
         raw_data=receipt_data.dict(),
         id=generate_random_id(),
         total=total,
-        amount=receipt_data.payment.amount,
-        rest=receipt_data.payment.amount - total,
+        amount=payment.amount,
+        rest=payment.amount - total,
+        payment_type=payment.type,
     )
     db.add(receipt)
     db.commit()

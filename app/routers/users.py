@@ -6,6 +6,7 @@ from app.schemas import UserCreate, UserResponse, Token
 from app.crud import create_user, create_access_token
 from app.utils import authenticate_user, get_user_by_username
 
+
 router = APIRouter(
     prefix='',
     tags=['Users'],

@@ -5,10 +5,11 @@ from fastapi import APIRouter, Query, HTTPException, Depends, status
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import User, Receipt
+from app.models import User, Receipt, PaymentType
 from app.schemas import ReceiptCreate, ReceiptResponse
 from app.crud import create_receipt_record
 from app.utils import verify_access_token, create_receipt_preview
+
 
 router = APIRouter(
     prefix='/receipts',
@@ -60,7 +61,7 @@ def get_receipts(
         date_to: Optional[datetime] = Query(None, description="Filter receipts created before this date"),
         min_total: Optional[float] = Query(None, description="Filter receipts with total greater than this amount"),
         max_total: Optional[float] = Query(None, description="Filter receipts with total less than this amount"),
-        # payment_type: Optional[str] = Query(None, description="Filter receipts by payment type", regex="^(cash|cashless)$"),
+        payment_type: Optional[PaymentType] = Query(None, description="Filter receipts by payment type"),
 ):
     query = db.query(Receipt).filter(Receipt.owner_id == current_user.id)
 
@@ -72,6 +73,8 @@ def get_receipts(
         query = query.filter(Receipt.total >= min_total)
     if max_total is not None:
         query = query.filter(Receipt.total <= max_total)
+    if payment_type:
+        query = query.filter(Receipt.payment_type == payment_type.value)
 
     receipts = query.limit(limit).offset(skip)
 

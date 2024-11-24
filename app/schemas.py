@@ -1,8 +1,10 @@
 from decimal import Decimal
 
 from pydantic import BaseModel, validator
-from typing import List, Union, Dict, Literal
+from typing import List, Union, Dict
 from datetime import datetime
+
+from app.models import PaymentType
 
 
 class UserBase(BaseModel):
@@ -37,8 +39,11 @@ class TokenData(BaseModel):
 
 
 class Payment(BaseModel):
-    type: Literal['cash', 'cashless']
+    type: PaymentType
     amount: Decimal
+
+    class Config:
+        use_enum_values = True
 
 
 class Product(BaseModel):

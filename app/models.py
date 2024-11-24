@@ -7,6 +7,7 @@ from sqlalchemy.sql.expression import text
 from datetime import datetime
 from app.database import Base
 from app.services import DecimalEncoder
+import enum
 
 
 class User(Base):
@@ -18,6 +19,11 @@ class User(Base):
     last_name = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     receipts = relationship("Receipt", back_populates="owner")
+
+
+class PaymentType(enum.Enum):
+    CASH = "cash"
+    CASHLESS = "cashless"
 
 
 class Receipt(Base):
@@ -35,6 +41,7 @@ class Receipt(Base):
     amount = Column(DECIMAL(18, 6), nullable=False)
     rest = Column(DECIMAL(18, 6), nullable=False)
     owner = relationship("User", back_populates="receipts")
+    payment_type = Column(String(12), nullable=False)
 
     @property
     def raw_data(self):
