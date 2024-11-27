@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.crud import create_user
 from app.main import app
 from app.config import settings
 from sqlalchemy import create_engine
@@ -85,3 +86,16 @@ def api_client():
     yield client
 
     Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture()
+def registered_client(api_client):
+    post_data = {
+        "first_name": "test_first_name",
+        "last_name": "Test_last_name",
+        "username": "test_username_6",
+        "password": "test_password"
+    }
+    user = create_user(db, user_data=post_data)
+
+    return user
