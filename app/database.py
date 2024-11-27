@@ -4,9 +4,11 @@ from sqlalchemy.orm import sessionmaker
 from app.config import settings
 
 
+db_name = 'test_db' if settings.ENVIRONMENT == 'TEST' else settings.DB_NAME
+
 SQLALCHEMY_DATABASE_URL = f'postgresql{settings.add_db_driver()}://' \
                           f'{settings.DB_USER_NAME}:{settings.DB_USER_PASSWORD}' \
-                          f'@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}'
+                          f'@{settings.DB_HOST}:{settings.DB_PORT}/{db_name}'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
