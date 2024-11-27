@@ -1,7 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.crud import create_user
 from app.main import app
 from app.config import settings
 from sqlalchemy import create_engine
@@ -11,11 +10,14 @@ from app.database import get_db, Base
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
+from app.models import User
+from app.utils import get_password_hash
+
 
 TEST_DB_NAME = 'test_db'
 
 
-def connect_to_test_db():
+def connect_for_db():
     conn = psycopg2.connect(
         user=settings.DB_USER_NAME, password=settings.DB_USER_PASSWORD, host=settings.DB_HOST, port=settings.DB_PORT
     )
@@ -25,7 +27,7 @@ def connect_to_test_db():
 
 
 def create_test_database():
-    conn = connect_to_test_db()
+    conn = connect_for_db()
     cur = conn.cursor()
 
     cur.execute(f"CREATE DATABASE {TEST_DB_NAME};")
@@ -34,7 +36,7 @@ def create_test_database():
 
 
 def drop_test_database():
-    conn = connect_to_test_db()
+    conn = connect_for_db()
     cur = conn.cursor()
 
     cur.execute(
@@ -54,48 +56,54 @@ def setup_test_db():
     drop_test_database()
 
 
-# @pytest.fixture(scope="function", autouse=True)
-# def setup_and_teardown():
-    # Base.metadata.create_all(bind=engine)
-    # yield
-    # Base.metadata.drop_all(bind=engine)
-
-
-@pytest.fixture()
-def api_client():
-    SQLALCHEMY_DATABASE_URL = f'postgresql{settings.add_db_driver()}://' \
+@pytest.fixture(scope="function")
+def db_session():
+    SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg2://' \
                               f'{settings.DB_USER_NAME}:{settings.DB_USER_PASSWORD}' \
-                              f'@{settings.DB_HOST}:{settings.DB_PORT}/test_db'
+                              f'@{settings.DB_HOST}:{settings.DB_PORT}/{TEST_DB_NAME}'
 
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     Base.metadata.create_all(bind=engine)
 
-    def override_get_db():
-        db = TestingSessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
+    db = TestingSessionLocal()
 
-    client = TestClient(app)
+    yield db
 
-    app.dependency_overrides[get_db] = override_get_db
-
-    yield client
+    db.close()
 
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture()
-def registered_client(api_client):
-    post_data = {
+def api_client(db_session):
+    def override_get_db():
+        try:
+            yield db_session
+        finally:
+            db_session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    client = TestClient(app)
+
+    yield client
+
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def registered_client(db_session):
+    user_data = {
         "first_name": "test_first_name",
         "last_name": "Test_last_name",
         "username": "test_username_6",
-        "password": "test_password"
+        "password": get_password_hash("test_password")
     }
-    user = create_user(db, user_data=post_data)
 
-    return user
+    new_user = User(**user_data)
+    db_session.add(new_user)
+    db_session.commit()
+    db_session.refresh(new_user)
+
+    return new_user
