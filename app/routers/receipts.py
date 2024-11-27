@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Query, HTTPException, Depends, status
+from fastapi import APIRouter, Query, HTTPException, Depends, status, Path
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -26,18 +26,15 @@ def create_receipt(
     return ReceiptResponse.from_orm_with_nested(receipt)
 
 
-@router.get('/{id}', response_model=ReceiptResponse)
-def get_receipt(id: str, db: Session = Depends(get_db), current_user: User = Depends(verify_access_token)):
-    receipt = db.query(Receipt).filter(Receipt.id == id, Receipt.owner_id == current_user.id).first()
-
-    if receipt is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Receipt not found")
-
-    return ReceiptResponse.from_orm_with_nested(receipt)
-
-
 @router.get('/{id}/preview/', response_class=PlainTextResponse)
-def get_receipt_preview(id: str, line_length: int = 30, db: Session = Depends(get_db)):
+def get_receipt_preview(
+        id: str = Path(description="receipt id"),
+        db: Session = Depends(get_db),
+        line_length: int = Query(30, description="Number of characters in the receipt line"),
+):
+    """
+    View receipt in text format for an unauthorized user (by receipt ID)
+    """
     receipt = db.query(Receipt).filter(Receipt.id == id).first()
 
     if receipt is None:
@@ -49,6 +46,23 @@ def get_receipt_preview(id: str, line_length: int = 30, db: Session = Depends(ge
     receipt_preview = create_receipt_preview(receipt, line_length)
 
     return  receipt_preview
+
+
+@router.get('/{id}', response_model=ReceiptResponse)
+def get_receipt(
+        id: str = Path(description="receipt id"),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(verify_access_token),
+):
+    """
+    Get information about a receipt by its ID
+    """
+    receipt = db.query(Receipt).filter(Receipt.id == id, Receipt.owner_id == current_user.id).first()
+
+    if receipt is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Receipt not found")
+
+    return ReceiptResponse.from_orm_with_nested(receipt)
 
 
 @router.get('/', response_model=List[ReceiptResponse])
@@ -63,6 +77,9 @@ def get_receipts(
         max_total: Optional[float] = Query(None, description="Filter receipts with total less than this amount"),
         payment_type: Optional[PaymentType] = Query(None, description="Filter receipts by payment type"),
 ):
+    """
+    Get a list of receipts based on filtering parameters
+    """
     query = db.query(Receipt).filter(Receipt.owner_id == current_user.id)
 
     if date_from:

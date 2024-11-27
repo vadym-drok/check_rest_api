@@ -24,6 +24,9 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post('/login', response_model=Token)
 def login(login_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """
+    Login using your username and password
+    """
     user = authenticate_user(db, login_data.username, login_data.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password")
