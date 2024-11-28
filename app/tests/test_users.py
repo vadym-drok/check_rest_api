@@ -1,4 +1,5 @@
 from fastapi import status
+import pytest
 
 
 def test_root(api_client):
@@ -50,3 +51,23 @@ def test_user_login(api_client, registered_client):
     assert response.status_code == status.HTTP_200_OK
     assert response_data["access_token"]
     assert response_data["token_type"] == "bearer"
+
+
+@pytest.mark.parametrize(
+    "add_post_data, response_status_code",
+    [
+        ({}, status.HTTP_422_UNPROCESSABLE_ENTITY),
+        ({"password": "test_password_1"}, status.HTTP_401_UNAUTHORIZED),
+    ]
+)
+def test_user_login_failed(add_post_data, response_status_code, api_client, registered_client):
+    post_data = {
+        "username": registered_client.username,
+        "grant_type": "password",
+        **add_post_data,
+    }
+    response = api_client.post("/login", data=post_data)
+    response_data = response.json()
+
+    assert "access_token" not in response_data
+    assert response.status_code ==  response_status_code
