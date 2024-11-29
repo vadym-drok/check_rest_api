@@ -95,11 +95,11 @@ def api_client(db_session):
 
 
 @pytest.fixture()
-def registered_client(db_session):
+def registered_user(db_session):
     user_data = {
         "first_name": "test_first_name",
         "last_name": "Test_last_name",
-        "username": "test_username_6",
+        "username": "test_username_1",
         "password": get_password_hash("test_password")
     }
 
@@ -112,22 +112,39 @@ def registered_client(db_session):
 
 
 @pytest.fixture()
-def authorized_client(api_client, registered_client):
-    token_data = {"username": registered_client.username}
+def second_user(db_session):
+    user_data = {
+        "first_name": "test_second_name",
+        "last_name": "Test_last_name",
+        "username": "test_username_2",
+        "password": get_password_hash("test_password")
+    }
+
+    new_user = User(**user_data)
+    db_session.add(new_user)
+    db_session.commit()
+    db_session.refresh(new_user)
+
+    return new_user
+
+
+@pytest.fixture()
+def authorized_client(api_client, registered_user):
+    token_data = {"username": registered_user.username}
     access_token = create_access_token(token_data)
 
     api_client.headers.update({
         "Authorization": f"Bearer {access_token.access_token}"
     })
 
-    return api_client, registered_client
+    return api_client, registered_user
 
 
 @pytest.fixture()
-def create_receipt(registered_client, db_session):
+def create_receipt(registered_user, db_session):
     def factory(receipt_data):
         receipt_create = ReceiptCreate(**receipt_data)
-        receipt = create_receipt_record(db=db_session, current_user=registered_client, receipt_data=receipt_create)
+        receipt = create_receipt_record(db=db_session, current_user=registered_user, receipt_data=receipt_create)
         return receipt
 
     return factory
@@ -154,6 +171,25 @@ def receipt(create_receipt):
         "payment": {
             "type": "cash",
             "amount": 100
+        }
+    }
+    receipt = create_receipt(receipt_data)
+    return receipt
+
+
+@pytest.fixture()
+def second_user_receipt(create_receipt):
+    receipt_data = {
+        "products": [
+            {
+                "name": "product_second_user",
+                "price": 1,
+                "quantity": 3,
+            },
+        ],
+        "payment": {
+            "type": "cash",
+            "amount": 10
         }
     }
     receipt = create_receipt(receipt_data)

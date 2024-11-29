@@ -31,7 +31,7 @@ class TestReceipts:
     total = Decimal(1 * 2 + 0.2 * 20)
 
     def test_create_receipt(self, authorized_client, db_session):
-        api_client, _registered_client = authorized_client
+        api_client, _registered_user = authorized_client
         response = api_client.post("/receipts", json=self.receipt_post_data)
         response_data = response.json()
 
@@ -50,7 +50,7 @@ class TestReceipts:
         assert db_session.query(Receipt).count() == 0
 
     def test_get_receipt(self, authorized_client, receipt):
-        api_client, _registered_client = authorized_client
+        api_client, _registered_user = authorized_client
         response = api_client.get(f"/receipts/{receipt.id}")
         response_data = response.json()
 
@@ -65,3 +65,11 @@ class TestReceipts:
         assert "product_1" in response_text
         assert "add_field_3" in response_text
 
+    def get_all_user_receipts(self, authorized_client, second_user_receipt, receipt):
+        api_client, _registered_user = authorized_client
+        response = api_client.get("/receipts/")
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert len(response_data) == 0
