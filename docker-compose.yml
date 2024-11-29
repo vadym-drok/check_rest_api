@@ -11,6 +11,8 @@ services:
       - POSTGRES_USER=${DB_USER_NAME}
       - POSTGRES_PASSWORD=${DB_USER_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   pgadmin:
     container_name: pgadmin
@@ -33,5 +35,7 @@ services:
       - db
       - pgadmin
     restart: always
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local
