@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.crud import create_access_token
 from app.main import app
 from app.config import settings
 from sqlalchemy import create_engine
@@ -107,3 +108,15 @@ def registered_client(db_session):
     db_session.refresh(new_user)
 
     return new_user
+
+
+@pytest.fixture()
+def authorized_client(api_client, registered_client):
+    token_data = {"username": registered_client.username}
+    access_token = create_access_token(token_data)
+
+    api_client.headers.update({
+        "Authorization": f"Bearer {access_token.access_token}"
+    })
+
+    return api_client, registered_client
