@@ -131,3 +131,30 @@ def create_receipt(registered_client, db_session):
         return receipt
 
     return factory
+
+
+@pytest.fixture()
+def receipt(create_receipt):
+    receipt_data = {
+        "products": [
+            {
+                "name": "product_1",
+                "price": 1,
+                "quantity": 2,
+                "add_field_1": "test_1",
+                "add_field_2": "test_2"
+            },
+            {
+                "name": "product_2",
+                "price": 0.2,
+                "quantity": 20,
+                "add_field_3": "test_3"
+            }
+        ],
+        "payment": {
+            "type": "cash",
+            "amount": 100
+        }
+    }
+    receipt = create_receipt(receipt_data)
+    return receipt
