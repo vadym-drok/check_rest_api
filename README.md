@@ -1,4 +1,4 @@
-# FastAPI Project
+# FastAPI Receipts Service
 
 This project is a REST API service implemented using [FastAPI](https://fastapi.tiangolo.com/). It includes functionality for managing users and receipts using a PostgreSQL database.  
 The service allows users to register, authenticate, create, and view receipts.
