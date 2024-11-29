@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from fastapi import status
@@ -74,20 +75,26 @@ class TestReceipts:
 
         assert len(response_data) == receipts.count()
 
-    # @pytest.mark.parametrize(
-    #     "filtering_params, results_number",
-    #     [
-    #         (['skip=2'], 4),
-    #     ]
-    # )
-    # def test_get_user_receipts_with_filters(
-    #         self, filtering_params, results_number, authorized_client, second_user_receipt, receipts
-    # ):
-    #     api_client, _registered_user = authorized_client
-    #     url = f"'/receipts/?'{''.join(filtering_params)}"
-    #     response = api_client.get(url)
-    #
-    #     assert response.status_code == status.HTTP_200_OK
-    #     response_data = response.json()
-    #
-    #     assert len(response_data) == results_number
+    @pytest.mark.parametrize(
+        "filtering_params, results_number",
+        [
+            (['skip=2'], 4),
+            (['limit=2'], 2),
+            ([f'date_from={datetime.now()}'], 6),
+            ([f'date_to={datetime.now()}'], 0),
+            (['min_total=10'], 3),
+            (['max_total=10'], 4),
+            (['payment_type=cashless'], 2),
+            (['skip=1', 'payment_type=cash', f'date_from={datetime.now()}'], 3),
+        ]
+    )
+    def test_get_user_receipts_with_filters(
+            self, filtering_params, results_number, authorized_client, second_user_receipt, receipts
+    ):
+        api_client, _registered_user = authorized_client
+        url = f"/receipts/?{'&'.join(filtering_params)}"
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert len(response_data) == results_number

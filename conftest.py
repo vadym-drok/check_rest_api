@@ -184,42 +184,42 @@ def receipts(create_receipt, db_session):
             "products": [{"name": "product_1", "price": 1, "quantity": 2}],
             "payment": {
                 "type": "cash",
-                "amount": 10
+                "amount": 100
             }
         },
         {
-            "products": [{"name": "product_2", "price": 0.2, "quantity": 20}],
+            "products": [{"name": "product_2", "price": 1, "quantity": 10}],
             "payment": {
                 "type": "cashless",
-                "amount": 5
+                "amount": 100
             }
         },
         {
-            "products": [{"name": "product_3", "price": 1, "quantity": 2}],
+            "products": [{"name": "product_3", "price": 1, "quantity": 5}],
             "payment": {
                 "type": "cashless",
-                "amount": 2
+                "amount": 100
             }
         },
         {
-            "products": [{"name": "product_4", "price": 1, "quantity": 2}],
+            "products": [{"name": "product_4", "price": 1, "quantity": 15}],
             "payment": {
                 "type": "cash",
-                "amount": 3
+                "amount": 100
             }
         },
         {
             "products": [{"name": "product_5", "price": 1, "quantity": 2}],
             "payment": {
                 "type": "cash",
-                "amount": 12
+                "amount": 100
             }
         },
         {
-            "products": [{"name": "product_6", "price": 1, "quantity": 2}],
+            "products": [{"name": "product_6", "price": 1, "quantity": 13}],
             "payment": {
                 "type": "cash",
-                "amount": 12
+                "amount": 100
             }
         },
     ]
