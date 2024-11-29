@@ -72,4 +72,4 @@ class TestReceipts:
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
 
-        assert len(response_data) == 0
+        assert len(response_data) == len(receipts)

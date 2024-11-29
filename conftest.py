@@ -11,7 +11,7 @@ from app.database import get_db, Base
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
-from app.models import User
+from app.models import User, Receipt
 from app.schemas import ReceiptCreate
 from app.utils import get_password_hash
 
@@ -178,32 +178,58 @@ def receipt(create_receipt):
 
 
 @pytest.fixture()
-def receipts(create_receipt):
-    receipts_data = [{
-        "products": [
-            {
-                "name": "product_1",
-                "price": 1,
-                "quantity": 2,
-                "add_field_1": "test_1",
-                "add_field_2": "test_2"
-            },
-            {
-                "name": "product_2",
-                "price": 0.2,
-                "quantity": 20,
-                "add_field_3": "test_3"
+def receipts(create_receipt, db_session):
+    receipts_data = [
+        {
+            "products": [{"name": "product_1", "price": 1, "quantity": 2}],
+            "payment": {
+                "type": "cash",
+                "amount": 10
             }
-        ],
-        "payment": {
-            "type": "cash",
-            "amount": 100
-        }
-    }]
+        },
+        {
+            "products": [{"name": "product_2", "price": 0.2, "quantity": 20}],
+            "payment": {
+                "type": "cashless",
+                "amount": 5
+            }
+        },
+        {
+            "products": [{"name": "product_3", "price": 1, "quantity": 2}],
+            "payment": {
+                "type": "cashless",
+                "amount": 2
+            }
+        },
+        {
+            "products": [{"name": "product_4", "price": 1, "quantity": 2}],
+            "payment": {
+                "type": "cash",
+                "amount": 3
+            }
+        },
+        {
+            "products": [{"name": "product_5", "price": 1, "quantity": 2}],
+            "payment": {
+                "type": "cash",
+                "amount": 12
+            }
+        },
+        {
+            "products": [{"name": "product_6", "price": 1, "quantity": 2}],
+            "payment": {
+                "type": "cash",
+                "amount": 12
+            }
+        },
+    ]
+    receipt_ids = []
     for receipt_data in receipts_data:
-        create_receipt(receipt_data)
+        receipt = create_receipt(receipt_data)
+        receipt_ids.append(receipt.id)
 
-    return
+    receipts = db_session.query(Receipt).filter(Receipt.id.in_(receipt_ids))
+    return receipts
 
 @pytest.fixture()
 def second_user_receipt(create_receipt, second_user):
