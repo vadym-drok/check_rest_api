@@ -33,11 +33,7 @@ The service allows users to register, authenticate, create, and view receipts.
    ```bash
    make run-tests
    ```
-   or with re-rebuild images and restart containers
-   ```bash
-   make docker-run-tests
-   ```
-   
+ 
 ## Using the API
 
 - **User Registration**:
