@@ -65,7 +65,7 @@ class TestReceipts:
         assert "product_1" in response_text
         assert "add_field_3" in response_text
 
-    def get_all_user_receipts(self, authorized_client, second_user_receipt, receipt):
+    def get_all_user_receipts(self, authorized_client, second_user_receipt, receipts):
         api_client, _registered_user = authorized_client
         response = api_client.get("/receipts/")
 

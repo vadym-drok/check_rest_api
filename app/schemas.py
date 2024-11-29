@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, validator
-from typing import List, Union, Dict
+from pydantic import BaseModel, ConfigDict, validator
+from typing import List, Union
 from datetime import datetime
 
 from app.models import PaymentType
@@ -20,8 +20,7 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):
@@ -42,8 +41,7 @@ class Payment(BaseModel):
     type: PaymentType
     amount: Decimal
 
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class Product(BaseModel):
@@ -52,8 +50,7 @@ class Product(BaseModel):
     quantity: int
     total: Decimal = None
 
-    class Config:
-        extra = "allow"
+    model_config = ConfigDict(extra="allow")
 
     @validator('total', pre=True, always=True)
     def calculate_total(cls, value, values):

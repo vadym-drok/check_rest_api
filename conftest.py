@@ -142,9 +142,9 @@ def authorized_client(api_client, registered_user):
 
 @pytest.fixture()
 def create_receipt(registered_user, db_session):
-    def factory(receipt_data):
+    def factory(receipt_data, current_user=registered_user):
         receipt_create = ReceiptCreate(**receipt_data)
-        receipt = create_receipt_record(db=db_session, current_user=registered_user, receipt_data=receipt_create)
+        receipt = create_receipt_record(db=db_session, current_user=current_user, receipt_data=receipt_create)
         return receipt
 
     return factory
@@ -178,7 +178,35 @@ def receipt(create_receipt):
 
 
 @pytest.fixture()
-def second_user_receipt(create_receipt):
+def receipts(create_receipt):
+    receipts_data = [{
+        "products": [
+            {
+                "name": "product_1",
+                "price": 1,
+                "quantity": 2,
+                "add_field_1": "test_1",
+                "add_field_2": "test_2"
+            },
+            {
+                "name": "product_2",
+                "price": 0.2,
+                "quantity": 20,
+                "add_field_3": "test_3"
+            }
+        ],
+        "payment": {
+            "type": "cash",
+            "amount": 100
+        }
+    }]
+    for receipt_data in receipts_data:
+        create_receipt(receipt_data)
+
+    return
+
+@pytest.fixture()
+def second_user_receipt(create_receipt, second_user):
     receipt_data = {
         "products": [
             {
@@ -192,5 +220,5 @@ def second_user_receipt(create_receipt):
             "amount": 10
         }
     }
-    receipt = create_receipt(receipt_data)
+    receipt = create_receipt(receipt_data, current_user=second_user)
     return receipt
