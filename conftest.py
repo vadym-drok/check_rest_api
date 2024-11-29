@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.crud import create_access_token
+from app.crud import create_access_token, create_receipt_record
 from app.main import app
 from app.config import settings
 from sqlalchemy import create_engine
@@ -12,6 +12,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 from app.models import User
+from app.schemas import ReceiptCreate
 from app.utils import get_password_hash
 
 
@@ -120,3 +121,13 @@ def authorized_client(api_client, registered_client):
     })
 
     return api_client, registered_client
+
+
+@pytest.fixture()
+def create_receipt(registered_client, db_session):
+    def factory(receipt_data):
+        receipt_create = ReceiptCreate(**receipt_data)
+        receipt = create_receipt_record(db=db_session, current_user=registered_client, receipt_data=receipt_create)
+        return receipt
+
+    return factory

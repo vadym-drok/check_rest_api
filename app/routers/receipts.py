@@ -45,7 +45,7 @@ def get_receipt_preview(
 
     receipt_preview = create_receipt_preview(receipt, line_length)
 
-    return  receipt_preview
+    return receipt_preview
 
 
 @router.get('/{id}', response_model=ReceiptResponse)

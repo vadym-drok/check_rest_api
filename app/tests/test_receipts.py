@@ -10,7 +10,7 @@ class TestReceipts:
     receipt_post_data = {
         "products": [
             {
-                "name": "product_3",
+                "name": "product_1",
                 "price": 1,
                 "quantity": 2,
                 "add_field_1": "test_1",
@@ -28,17 +28,17 @@ class TestReceipts:
             "amount": 100
         }
     }
+    total = Decimal(1 * 2 + 0.2 * 20)
 
     def test_create_receipt(self, authorized_client, db_session):
-        api_client, registered_client = authorized_client
+        api_client, _registered_client = authorized_client
         response = api_client.post("/receipts", json=self.receipt_post_data)
         response_data = response.json()
 
         assert response.status_code == status.HTTP_201_CREATED
         assert type(response_data['id']) == str
-        total = Decimal(1 * 2 + 0.2 * 20)
-        assert Decimal(response_data['total']) == total
-        assert Decimal(response_data['rest']) == 100 - total
+        assert Decimal(response_data['total']) == self.total
+        assert Decimal(response_data['rest']) == 100 - self.total
         assert db_session.query(Receipt).count() == 1
 
     def test_create_receipt_for_non_authorized_client(self, api_client, db_session):
@@ -48,3 +48,23 @@ class TestReceipts:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response_data['detail'] == 'Not authenticated'
         assert db_session.query(Receipt).count() == 0
+
+    def test_get_receipt(self, authorized_client, create_receipt):
+        receipt = create_receipt(self.receipt_post_data)
+
+        api_client, _registered_client = authorized_client
+        response = api_client.get(f"/receipts/{receipt.id}")
+        response_data = response.json()
+
+        assert response.status_code == status.HTTP_200_OK
+        assert Decimal(response_data['total']) == self.total
+        assert Decimal(response_data['rest']) == 100 - self.total
+
+    def test_get_receipt_preview_for_non_authorized_client(self, api_client, create_receipt):
+        receipt = create_receipt(self.receipt_post_data)
+
+        response = api_client.get(f"/receipts/{receipt.id}/preview/")
+        assert response.status_code == status.HTTP_200_OK
+        response_text = response.text
+        assert "product_1" in response_text
+        assert "add_field_3" in response_text
