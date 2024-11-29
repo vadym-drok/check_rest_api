@@ -65,11 +65,29 @@ class TestReceipts:
         assert "product_1" in response_text
         assert "add_field_3" in response_text
 
-    def get_all_user_receipts(self, authorized_client, second_user_receipt, receipts):
+    def test_get_all_user_receipts(self, authorized_client, second_user_receipt, receipts):
         api_client, _registered_user = authorized_client
         response = api_client.get("/receipts/")
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
 
-        assert len(response_data) == len(receipts)
+        assert len(response_data) == receipts.count()
+
+    # @pytest.mark.parametrize(
+    #     "filtering_params, results_number",
+    #     [
+    #         (['skip=2'], 4),
+    #     ]
+    # )
+    # def test_get_user_receipts_with_filters(
+    #         self, filtering_params, results_number, authorized_client, second_user_receipt, receipts
+    # ):
+    #     api_client, _registered_user = authorized_client
+    #     url = f"'/receipts/?'{''.join(filtering_params)}"
+    #     response = api_client.get(url)
+    #
+    #     assert response.status_code == status.HTTP_200_OK
+    #     response_data = response.json()
+    #
+    #     assert len(response_data) == results_number
