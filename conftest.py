@@ -231,6 +231,7 @@ def receipts(create_receipt, db_session):
     receipts = db_session.query(Receipt).filter(Receipt.id.in_(receipt_ids))
     return receipts
 
+
 @pytest.fixture()
 def second_user_receipt(create_receipt, second_user):
     receipt_data = {
