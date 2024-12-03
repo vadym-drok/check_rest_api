@@ -44,6 +44,23 @@ The service allows users to register, authenticate, create, and view receipts.
   `POST /receipts`
 - **Get List of Receipts**:
   `GET /receipts`
+- **Get text preview of Receipt**:
+  `GET /receipts/{id}/preview/`
+```
+     SP Borys Johnsoniuk      
+==============================
+2 x 1.00
+product_1
+add_field_1 Red
+add_field_2 Test02        2.00
+==============================
+TOTAL                 2.000000
+Card                100.000000
+Change               98.000000
+==============================
+       03.12.2024 19:50       
+ Thank you for your purchase! 
+```
 
 Detailed description of all available routes can be found in the Swagger documentation at [http://localhost:8003/](http://localhost:8003/).
 

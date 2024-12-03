@@ -91,11 +91,11 @@ def create_receipt_preview(receipt: Receipt, line_length: int) -> str:
         if product != last_product:
             product_lines.append("-" * line_length)
 
-    header = "ФОП Джонсонюк Борис".center(line_length)  # TODO -> move to User LegalEntity
-    total_line = f"СУМА{str(receipt.total):>{line_length - len('СУМА')}}"
-    payment_line = f"Картка{str(receipt.amount):>{line_length - len('Картка')}}"
-    rest_line = f"Решта{str(receipt.rest):>{line_length - len('Решта')}}"
-    footer = "Дякуємо за покупку!".center(line_length)
+    header = "SP Borys Johnsoniuk".center(line_length)  # TODO -> move to User LegalEntity
+    total_line = f"TOTAL{str(receipt.total):>{line_length - len('TOTAL')}}"
+    payment_line = f"Card{str(receipt.amount):>{line_length - len('Card')}}"
+    rest_line = f"Change{str(receipt.rest):>{line_length - len('Change')}}"
+    footer = "Thank you for your purchase!".center(line_length)
     date_time = receipt.created_at.strftime("%d.%m.%Y %H:%M").center(line_length)
 
     separator = "=" * line_length
