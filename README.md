@@ -18,7 +18,7 @@ The service allows users to register, authenticate, create, and view receipts.
    
    Run the command:
    ```bash
-   docker-compose up -d
+   make install
    ```
    This command will start PostgreSQL, PgAdmin, and the FastAPI service.
 
